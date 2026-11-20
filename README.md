@@ -1,36 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KRAZE® — Tienda online (diseño)
 
-## Getting Started
+Sitio de la marca de polos boxy fit KRAZE, construido con Next.js 16 (App Router), Tailwind CSS 4 y TypeScript.
+Por ahora es **solo la parte visual**: no hay carrito, pagos ni base de datos.
 
-First, run the development server:
+## Cómo correrlo
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Páginas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/` — Home: hero, drop actual con filtros por color, ¿Qué es boxy fit?, colecciones, comunidad y cuenta regresiva del próximo drop.
+- `/producto/[slug]` — Ficha de producto: galería, tallas con stock, cantidad, compra por WhatsApp, calculadora de envío y medidas.
 
-## Learn More
+## Dónde editar el contenido
 
-To learn more about Next.js, take a look at the following resources:
+- `src/lib/products.ts` — productos, precios, stock, fotos, medidas, colecciones y comunidad.
+- `src/lib/site.ts` — WhatsApp, Instagram, drop actual, próximo drop (fecha del contador), promo y tarifas de envío.
+- `public/img/` — fotos.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> Los precios, el stock, las medidas y los costos de envío son **de ejemplo**: hay que confirmarlos con la marca.
