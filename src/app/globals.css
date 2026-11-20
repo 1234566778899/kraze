@@ -1,20 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #0d0d0d;
-  --color-cream: #f1ede6;
-  --color-paper: #faf8f4;
-  --color-fire: #ff4a1c;
-  --color-stone: #8a857d;
-  --color-line: #d9d3c9;
-  --color-coal: #1f1f1f;
-  --color-whatsapp: #25d366;
+  /* Paleta monocromática */
+  --color-ink: #0a0a0a;
+  --color-surface: #131313;
+  --color-line: #262626;
+  --color-snow: #f2f2f0;
+  --color-mute: #8a8a87;
+  --color-studio: #e9e7e3;
+  --color-signal: #ff4a1c;
 
-  --font-display: var(--font-anton), "Arial Narrow", sans-serif;
-  --font-sans: var(--font-grotesk), system-ui, sans-serif;
+  --font-display: var(--font-archivo), "Arial Black", sans-serif;
+  --font-sans: var(--font-archivo), system-ui, sans-serif;
   --font-mono: var(--font-spacemono), ui-monospace, monospace;
+  --font-condensed: var(--font-oswald), "Arial Narrow", sans-serif;
+  --color-highlight: #ffc107;
+  --color-sheet: #f8f9fa;
+  --color-panel: #212529;
+  --color-gray: #6c757d;
+  --color-rule: #dee2e6;
+  --color-field: #ced4da;
+  --color-success: #198754;
 
-  --animate-marquee: marquee 28s linear infinite;
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-scroll-dot: scroll-dot 1.8s ease-in-out infinite;
+  --animate-progress: progress 6s linear forwards;
 
   @keyframes marquee {
     from {
@@ -24,42 +34,100 @@
       transform: translateX(-50%);
     }
   }
+  @keyframes scroll-dot {
+    0% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    70% {
+      transform: translateY(14px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+  }
+  @keyframes progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    color-scheme: dark;
   }
 
   body {
-    background: var(--color-paper);
-    color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-snow);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
 
   ::selection {
-    background: var(--color-fire);
+    background: var(--color-snow);
     color: var(--color-ink);
   }
 }
 
+/* Títulos anchos y pesados */
 @utility display {
   font-family: var(--font-display);
-  line-height: 0.92;
+  font-weight: 800;
+  font-stretch: 125%;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
 }
 
-@utility label {
+/* Etiquetas técnicas en monoespaciada */
+@utility tech {
   font-family: var(--font-mono);
-  font-weight: 700;
   font-size: 11px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* Menú y botones: sans en negrita con espaciado amplio */
+@utility caps {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Tipografía condensada para fichas de producto y footer */
+@utility condensed {
+  font-family: var(--font-condensed);
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+/* Páginas claras (ficha, carrito, checkout): Inter 15px con espaciado 0.5px */
+@utility sheet-page {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: #111111;
+  color-scheme: light;
+}
+
+/* Fondo con puntos muy sutiles */
+@utility dotted {
+  background-image: radial-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .animate-marquee,
+  .animate-scroll-dot {
     animation: none;
   }
 }

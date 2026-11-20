@@ -18,6 +18,13 @@ export const site = {
     date: "2026-12-12T20:00:00-05:00",
   },
   promo: "3 polos x S/ 120",
+  // Datos del proveedor para el Libro de Reclamaciones. REEMPLAZAR con los datos reales de la empresa.
+  legal: {
+    razonSocial: "KRAZE (razón social por definir)",
+    ruc: "20XXXXXXXXX",
+    direccion: "Pucallpa, Ucayali, Perú",
+    email: "reclamos@kraze.pe",
+  },
 };
 
 export const shippingRates = [
@@ -27,6 +34,21 @@ export const shippingRates = [
   { zone: "Resto del Perú", time: "3 – 5 días", price: "S/ 18" },
   { zone: "Recojo en punto KRAZE", time: "Coordinar por WhatsApp", price: "Gratis" },
 ];
+
+export const departments = [
+  "Amazonas", "Áncash", "Apurímac", "Arequipa", "Ayacucho", "Cajamarca", "Callao", "Cusco", "Huancavelica",
+  "Huánuco", "Ica", "Junín", "La Libertad", "Lambayeque", "Lima", "Loreto", "Madre de Dios", "Moquegua",
+  "Pasco", "Piura", "Puno", "San Martín", "Tacna", "Tumbes", "Ucayali",
+];
+
+/** Costo de envío de ejemplo según el departamento. */
+export function shippingFor(department: string): { price: number; label: string } | null {
+  if (!department) return null;
+  if (department === "Ucayali") return { price: 8, label: "Delivery Pucallpa · 24h" };
+  if (department === "Huánuco") return { price: 10, label: "Huánuco · 24 – 48h" };
+  if (department === "Lima" || department === "Callao") return { price: 15, label: "Lima · 2 – 3 días" };
+  return { price: 18, label: "Resto del Perú · 3 – 5 días" };
+}
 
 export const shippingCities = [
   "Pucallpa, Ucayali",

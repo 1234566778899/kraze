@@ -14,11 +14,10 @@ export function WhatsAppButton() {
       href={site.whatsapp}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed right-4 bottom-4 z-40 flex h-14 items-center gap-2.5 rounded-full bg-whatsapp px-5 font-bold text-white shadow-[0_8px_24px_rgba(0,0,0,0.25)] transition-transform hover:-translate-y-0.5 md:right-8 md:bottom-8"
+      aria-label="Escríbenos por WhatsApp"
+      className="fixed right-5 bottom-5 z-40 grid size-12 place-items-center rounded-full border border-line bg-surface/90 text-snow backdrop-blur transition-colors hover:bg-snow hover:text-ink"
     >
-      <WhatsAppIcon className="size-6" />
-      <span className="hidden sm:inline">¿Dudas? Escríbenos</span>
-      <span className="sr-only sm:hidden">Escríbenos por WhatsApp</span>
+      <WhatsAppIcon className="size-5" />
     </a>
   );
 }

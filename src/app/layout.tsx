@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
-import { Anton, Space_Grotesk, Space_Mono } from "next/font/google";
+import { Archivo, Inter, Oswald, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { AnnouncementBar } from "@/components/announcement-bar";
 import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
+import { ShippingToast } from "@/components/shipping-toast";
 import { WhatsAppButton } from "@/components/whatsapp-button";
+import { CartProvider } from "@/lib/cart";
 
-const anton = Anton({ variable: "--font-anton", weight: "400", subsets: ["latin"] });
-const grotesk = Space_Grotesk({ variable: "--font-grotesk", subsets: ["latin"] });
+const archivo = Archivo({ variable: "--font-archivo", subsets: ["latin"], axes: ["wdth"] });
 const spaceMono = Space_Mono({ variable: "--font-spacemono", weight: ["400", "700"], subsets: ["latin"] });
+const oswald = Oswald({ variable: "--font-oswald", subsets: ["latin"] });
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "KRAZE® — Polos boxy fit · Ediciones limitadas",
+    default: "KRAZE® — Streetwear boxy fit en Perú",
     template: "%s · KRAZE®",
   },
   description:
@@ -20,13 +24,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es-PE" className={`${anton.variable} ${grotesk.variable} ${spaceMono.variable}`}>
-      {/* suppressHydrationWarning: algunas extensiones del navegador agregan atributos al body */}
+    // suppressHydrationWarning: algunas extensiones del navegador agregan atributos a html y body
+    <html lang="es-PE" className={`${archivo.variable} ${spaceMono.variable} ${oswald.variable} ${inter.variable}`} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col" suppressHydrationWarning>
-        <AnnouncementBar />
-        <div className="flex-1">{children}</div>
-        <Footer />
-        <WhatsAppButton />
+        <CartProvider>
+          <AnnouncementBar />
+          <Header />
+          <div className="flex-1">{children}</div>
+          <Footer />
+          <ShippingToast />
+          <WhatsAppButton />
+        </CartProvider>
       </body>
     </html>
   );

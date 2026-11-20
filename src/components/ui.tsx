@@ -1,84 +1,76 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
-import type { Badge } from "@/lib/products";
+import { ArrowIcon } from "./icons";
+import { ScrambleText } from "./scramble-text";
 
 const variants = {
-  dark: "bg-ink text-cream hover:bg-coal",
-  light: "bg-cream text-ink hover:bg-white",
-  fire: "bg-fire text-ink hover:brightness-110",
-  outline: "border-[1.5px] border-ink text-ink hover:bg-ink hover:text-cream",
-  outlineLight: "border-[1.5px] border-cream text-cream hover:bg-cream hover:text-ink",
+  solid: "bg-snow text-ink hover:bg-white",
+  outline: "border border-snow/70 text-snow hover:bg-snow hover:text-ink",
+  ghost: "text-snow underline-offset-4 hover:underline",
 } as const;
 
 type Variant = keyof typeof variants;
 
-const base =
-  "inline-flex h-13 items-center justify-center gap-2.5 px-7 font-mono text-[13px] font-bold tracking-wider uppercase transition-colors";
+const base = "caps inline-flex h-12 items-center justify-center gap-2.5 px-7 transition-colors";
 
 export function ButtonLink({
-  variant = "dark",
-  arrow,
+  variant = "solid",
   className = "",
   children,
   ...props
-}: ComponentProps<typeof Link> & { variant?: Variant; arrow?: boolean }) {
+}: ComponentProps<typeof Link> & { variant?: Variant }) {
   return (
     <Link className={`${base} ${variants[variant]} ${className}`} {...props}>
       {children}
-      {arrow && <span aria-hidden="true">→</span>}
     </Link>
   );
 }
 
 export function Button({
-  variant = "dark",
-  arrow,
+  variant = "solid",
   className = "",
   children,
   ...props
-}: ComponentProps<"button"> & { variant?: Variant; arrow?: boolean }) {
+}: ComponentProps<"button"> & { variant?: Variant }) {
   return (
-    <button type="button" className={`${base} ${variants[variant]} ${className}`} {...props}>
+    <button type="button" className={`${base} ${variants[variant]} disabled:cursor-not-allowed disabled:opacity-40 ${className}`} {...props}>
       {children}
-      {arrow && <span aria-hidden="true">→</span>}
     </button>
   );
 }
 
-const tones: Record<Badge["tone"], string> = {
-  fire: "bg-fire text-ink",
-  ink: "bg-ink text-cream",
-  muted: "bg-stone text-white",
-};
-
-export function Tag({ tone = "ink", children, className = "" }: { tone?: Badge["tone"] | "outline" | "outlineLight"; children: ReactNode; className?: string }) {
-  const style =
-    tone === "outline"
-      ? "border border-ink text-ink"
-      : tone === "outlineLight"
-        ? "border border-cream text-cream"
-        : tones[tone];
-  return <span className={`label inline-block px-2.5 py-1.5 text-[10px] ${style} ${className}`}>{children}</span>;
-}
-
+/** Encabezado de sección: etiqueta técnica + título ancho + enlace opcional. */
 export function SectionHeading({
-  eyebrow,
+  label,
+  index,
   title,
-  aside,
-  invert,
+  link,
 }: {
-  eyebrow: string;
+  label: string;
+  index?: string;
   title: string;
-  aside?: ReactNode;
-  invert?: boolean;
+  link?: { href: string; label: string };
 }) {
   return (
     <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-      <div className="flex flex-col gap-2.5">
-        <p className="label text-fire">{eyebrow}</p>
-        <h2 className={`display text-6xl md:text-8xl ${invert ? "text-cream" : ""}`}>{title}</h2>
+      <div className="flex flex-col gap-3">
+        <p className="tech flex flex-wrap gap-x-6 gap-y-1 text-mute">
+          <span>[ {label} ]</span>
+          {index && <span>[ {index} ]</span>}
+        </p>
+        <h2 className="display text-5xl md:text-7xl">
+          <ScrambleText text={title} />
+        </h2>
       </div>
-      {aside}
+      {link && (
+        <Link href={link.href} className="tech inline-flex items-center gap-2 self-start border-b border-snow/40 pb-1 text-snow transition-colors hover:border-snow md:self-auto">
+          {link.label} <ArrowIcon className="size-3" />
+        </Link>
+      )}
     </div>
   );
+}
+
+export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <div className={`mx-auto w-full max-w-[1140px] px-5 ${className}`}>{children}</div>;
 }
