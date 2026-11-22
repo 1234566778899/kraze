@@ -35,7 +35,17 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   const touchX = useRef<number | null>(null);
   const count = slides.length;
 
-  const go = useCallback((i: number) => setIndex(((i % count) + count) % count), [count]);
+  // Fotos que ya se pueden descargar: la actual y la siguiente (las demás esperan su turno).
+  const [loaded, setLoaded] = useState<Set<number>>(() => new Set([0, 1 % count]));
+
+  const go = useCallback(
+    (i: number) => {
+      const next = ((i % count) + count) % count;
+      setIndex(next);
+      setLoaded((prev) => (prev.has(next) && prev.has((next + 1) % count) ? prev : new Set([...prev, next, (next + 1) % count])));
+    },
+    [count],
+  );
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -89,13 +99,14 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
       <div className="relative mx-auto grid min-h-svh max-w-[1320px] grid-rows-[1fr_auto] md:min-h-[min(100svh,860px)] md:grid-cols-[1fr_1fr] md:grid-rows-1 md:items-center md:gap-10 md:px-10 md:pt-[61px]">
         {/* Foto con modelo: fondo completo en móvil, columna derecha en desktop */}
         <div className="absolute inset-0 md:relative md:inset-auto md:order-2 md:aspect-[4/5] md:max-h-[calc(100svh-140px)] md:w-full md:justify-self-end">
-          {slides.map((s, i) => (
+          {slides.map((s, i) => loaded.has(i) && (
             <Image
               key={s.product.slug}
               src={s.photo}
               alt={i === index ? `${s.product.name} ${s.product.color} con modelo` : ""}
               fill
-              preload={i === 0}
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : "low"}
               quality={85}
               sizes="(max-width: 768px) 100vw, 640px"
               className={`object-cover transition-[opacity,transform] duration-1000 ease-out md:rounded-2xl ${

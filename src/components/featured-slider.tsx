@@ -8,10 +8,20 @@ export type Slide = { title: string; href: string; image: string; position?: str
 
 /** Banner ancho con rotación automática y barras de progreso. */
 export function FeaturedSlider({ slides }: { slides: Slide[] }) {
-  const [i, setI] = useState(0);
+  const [i, setIndex] = useState(0);
+  // Fotos que ya se pueden descargar: la actual y la siguiente.
+  const [loaded, setLoaded] = useState<Set<number>>(() => new Set([0, 1 % slides.length]));
+  const setI = (next: number) => {
+    setIndex(next);
+    setLoaded((prev) => new Set([...prev, next, (next + 1) % slides.length]));
+  };
 
   useEffect(() => {
-    const id = setTimeout(() => setI((v) => (v + 1) % slides.length), 6000);
+    const id = setTimeout(() => {
+      const next = (i + 1) % slides.length;
+      setIndex(next);
+      setLoaded((prev) => new Set([...prev, next, (next + 1) % slides.length]));
+    }, 6000);
     return () => clearTimeout(id);
   }, [i, slides.length]);
 
@@ -19,7 +29,7 @@ export function FeaturedSlider({ slides }: { slides: Slide[] }) {
     <div className="relative mx-auto aspect-[4/5] w-full max-w-[1520px] overflow-hidden rounded-2xl sm:aspect-[16/9] md:aspect-[21/9]">
       {slides.map((s, idx) => (
         <div key={s.title} className={`absolute inset-0 transition-opacity duration-1000 ${idx === i ? "opacity-100" : "opacity-0"}`} aria-hidden={idx !== i}>
-          <Image src={s.image} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: s.position ?? "center" }} />
+          {loaded.has(idx) && <Image src={s.image} alt="" fill sizes="(max-width: 1520px) 100vw, 1520px" className="object-cover" style={{ objectPosition: s.position ?? "center" }} />}
         </div>
       ))}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.15),rgba(0,0,0,0.6))]" />
