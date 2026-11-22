@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Countdown } from "@/components/countdown";
+import { DropAlertForm } from "@/components/drop-alert-form";
 import { FeaturedSlider } from "@/components/featured-slider";
 import { HeroCarousel, type HeroSlide } from "@/components/hero-carousel";
 import { Marquee } from "@/components/marquee";
@@ -193,16 +194,7 @@ export default function Home() {
           <p className="tech text-mute">[ Próximo drop ] [ 04 / 04 ]</p>
           <h2 className="display text-[clamp(2.25rem,11vw,3rem)] md:text-7xl">{site.nextDrop.name}</h2>
           <Countdown date={site.nextDrop.date} />
-          <form className="flex w-full max-w-md border-b border-snow/40 focus-within:border-snow" action="#">
-            <label htmlFor="aviso" className="sr-only">
-              Tu número de WhatsApp
-            </label>
-            <span className="grid place-items-center pr-3 text-sm text-mute">+51</span>
-            <input id="aviso" type="tel" placeholder="Tu WhatsApp para avisarte" className="h-12 min-w-0 flex-1 bg-transparent text-sm placeholder:text-mute focus:outline-none" />
-            <button type="button" className="caps text-[11px]">
-              Avísame →
-            </button>
-          </form>
+          <DropAlertForm dropName={site.nextDrop.name} />
           <p className="tech text-[10px] text-mute">Solo {site.nextDrop.units} piezas // Los suscritos compran 1 hora antes</p>
         </Container>
       </section>

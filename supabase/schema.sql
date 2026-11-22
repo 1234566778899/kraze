@@ -115,3 +115,34 @@ end $$;
 
 revoke all on function public.subscribe_newsletter from public;
 grant execute on function public.subscribe_newsletter to anon, authenticated;
+
+-- Aviso del próximo drop (home): celulares de WhatsApp. Solo se escribe mediante subscribe_drop_alert().
+create table if not exists public.drop_alerts (
+  phone text not null,
+  drop_name text not null,
+  created_at timestamptz not null default now(),
+  primary key (phone, drop_name)
+);
+alter table public.drop_alerts enable row level security;
+revoke all on public.drop_alerts from anon, authenticated;
+grant all on public.drop_alerts to service_role;
+
+-- Registra un celular peruano (9 dígitos, empieza en 9) para avisarle del drop. Si ya existe no hace nada.
+create or replace function public.subscribe_drop_alert(p_phone text, p_drop text) returns void
+language plpgsql security definer set search_path = '' as $$
+declare
+  ph text := regexp_replace(coalesce(p_phone, ''), '\D', '', 'g');
+begin
+  if length(ph) = 11 and left(ph, 2) = '51' then
+    ph := substr(ph, 3);
+  end if;
+  if ph !~ '^9\d{8}$' then
+    raise exception 'Número inválido';
+  end if;
+  insert into public.drop_alerts (phone, drop_name)
+  values ('+51' || ph, left(coalesce(nullif(trim(p_drop), ''), 'próximo drop'), 80))
+  on conflict do nothing;
+end $$;
+
+revoke all on function public.subscribe_drop_alert from public;
+grant execute on function public.subscribe_drop_alert to anon, authenticated;
