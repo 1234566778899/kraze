@@ -3,8 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
+import { useAuth } from "@/lib/auth";
 import { soles, useCart } from "@/lib/cart";
-import { departments, shippingFor, site } from "@/lib/site";
+import { promo } from "@/lib/products";
+import { orderCode, supabase } from "@/lib/supabase";
+import { departments, shippingFor, whatsappWith } from "@/lib/site";
 
 // Checkout sin pasarela de pago: al finalizar se arma el pedido y se envía por WhatsApp,
 // donde KRAZE comparte los datos de Yape/Plin o transferencia.
@@ -14,6 +17,15 @@ const payments = [
   { id: "yape", title: "Yape / Plin", body: "Te enviaremos el número y el código QR por WhatsApp para que realices el pago." },
   { id: "transfer", title: "Transferencia bancaria", body: "Te compartiremos los números de cuenta por WhatsApp. Envíanos la constancia para despachar tu pedido." },
 ];
+
+/** Número de respaldo si Supabase no responde: fecha (AAMMDD) + 4 cifras al azar, ej. 251122-4831. */
+function fallbackOrderNumber() {
+  const d = new Date();
+  const ymd = [d.getFullYear() % 100, d.getMonth() + 1, d.getDate()].map((n) => String(n).padStart(2, "0")).join("");
+  return `${ymd}-${String(Math.floor(Math.random() * 10000)).padStart(4, "0")}`;
+}
+
+const rule = "--------------------------";
 
 function Step({ n, title, children }: { n: number; title: string; children: ReactNode }) {
   return (
@@ -39,13 +51,16 @@ function Field({ label, className = "", ...props }: ComponentProps<"input"> & { 
 }
 
 export function CheckoutView() {
-  const { ready, lines, subtotal, clear } = useCart();
+  const { ready, lines, subtotal, discount, clear } = useCart();
   const [department, setDepartment] = useState("");
   const [payment, setPayment] = useState(payments[0].id);
-  const [sent, setSent] = useState(false);
+  const [sent, setSent] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const { session, name } = useAuth();
+  const [firstName, ...rest] = name.split(" ");
 
   const shipping = shippingFor(department);
-  const total = subtotal + (shipping?.price ?? 0);
+  const total = subtotal - discount + (shipping?.price ?? 0);
 
   if (!ready) return <div className="h-[900px]" aria-busy="true" />;
 
@@ -53,7 +68,17 @@ export function CheckoutView() {
     return (
       <div className="mx-auto flex max-w-[512px] flex-col items-center gap-5 rounded-[4.8px] bg-white p-10 text-center shadow-[0_2px_4px_rgba(0,0,0,0.075)]">
         <p className="condensed text-[32px] font-bold">{sent ? "¡Pedido enviado!" : "Tu cesta está vacía"}</p>
-        {sent && <p className="text-gray">Abrimos WhatsApp con el detalle de tu pedido. Envía el mensaje y te responderemos con los datos de pago.</p>}
+        {sent && (
+          <>
+            <p className="condensed text-xl font-bold">Pedido #{sent}</p>
+            {session && (
+              <Link href="/cuenta" className="text-[13.125px] font-bold text-panel underline underline-offset-2">
+                Seguir mi pedido en Mi cuenta
+              </Link>
+            )}
+            <p className="text-gray">Abrimos WhatsApp con el detalle de tu pedido. Envía el mensaje y te responderemos con los datos de pago.</p>
+          </>
+        )}
         <Link href="/tienda" className="condensed grid h-16 place-items-center bg-panel px-10 text-xl font-bold tracking-[2px]! text-white">
           Seguir comprando
         </Link>
@@ -61,30 +86,69 @@ export function CheckoutView() {
     );
   }
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (busy) return;
     const f = new FormData(e.currentTarget);
     const get = (k: string) => String(f.get(k) ?? "").trim();
     const method = payments.find((p) => p.id === payment)?.title ?? "";
+
+    // La pestaña se abre ya (dentro del clic) para que el navegador no la bloquee;
+    // se le asigna el enlace de WhatsApp cuando Supabase devuelve el número de pedido.
+    const tab = window.open("", "_blank");
+    if (tab) tab.opener = null;
+    setBusy(true);
+
+    const { data: id, error } = await supabase.rpc("create_order", {
+      p_customer_name: `${get("nombre")} ${get("apellido")}`,
+      p_email: get("email"),
+      p_phone: get("telefono"),
+      p_address: get("direccion"),
+      p_reference: get("referencia"),
+      p_district: get("distrito"),
+      p_province: get("provincia"),
+      p_department: department,
+      p_payment_method: method,
+      p_items: lines.map((l) => ({
+        slug: l.slug,
+        name: l.product.design,
+        color: l.product.color,
+        size: l.size,
+        qty: l.qty,
+        unit_price: l.product.price,
+        subtotal: l.subtotal,
+        image: l.product.images[0],
+      })),
+      p_subtotal: subtotal,
+      p_discount: discount,
+      p_shipping: shipping?.price ?? 0,
+      p_total: total,
+    });
+    // Si la base no responde, el pedido igual se envía por WhatsApp con un número de respaldo.
+    const order = !error && typeof id === "number" ? orderCode(id) : fallbackOrderNumber();
+    // Formato de WhatsApp: *negrita* y _cursiva_.
     const message = [
-      "Hola KRAZE, quiero hacer este pedido:",
+      `*NUEVO PEDIDO KRAZE #${order}*`,
       "",
-      ...lines.map((l) => `• ${l.product.name} (${l.product.color}) — Talla ${l.size} x${l.qty} — ${soles(l.subtotal)}`),
+      `_Cliente: ${get("nombre")} ${get("apellido")}_`,
+      `_Teléfono: ${get("telefono")}_`,
+      `_Método de Pago: ${method}_`,
+      `_Dirección: ${get("direccion")}${get("referencia") ? ` (${get("referencia")})` : ""}_`,
+      `_Ubicación: ${get("distrito")}, ${get("provincia")}, ${department}_`,
+      rule,
+      ...lines.map((l) => `• ${l.product.design} ${l.product.color} (Talla: ${l.size}) x ${l.qty}`),
+      rule,
+      ...(discount > 0 ? [`Promo ${promo.label}: -${soles(discount)}`] : []),
+      `Envío: ${shipping ? soles(shipping.price) : "-"}`,
+      `*TOTAL: ${soles(total)}*`,
       "",
-      `Subtotal: ${soles(subtotal)}`,
-      `Envío (${shipping?.label ?? "-"}): ${shipping ? soles(shipping.price) : "-"}`,
-      `Total: ${soles(total)}`,
-      "",
-      `Nombre: ${get("nombre")} ${get("apellido")}`,
-      `Correo: ${get("email")}`,
-      `Teléfono: ${get("telefono")}`,
-      `Dirección: ${get("direccion")}${get("referencia") ? `, ${get("referencia")}` : ""}`,
-      `${get("distrito")}, ${get("provincia")}, ${department}`,
-      `Pago: ${method}`,
+      "Por favor, confírmeme mi pedido.",
     ].join("\n");
-    window.open(`${site.whatsapp}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+    if (tab) tab.location.href = whatsappWith(message);
+    else window.location.assign(whatsappWith(message));
+    setBusy(false);
     clear();
-    setSent(true);
+    setSent(order);
   };
 
   return (
@@ -92,7 +156,19 @@ export function CheckoutView() {
       {/* Datos */}
       <div className="flex flex-col gap-12 rounded-[4.8px] bg-white p-6 shadow-[0_2px_4px_rgba(0,0,0,0.075)]">
         <Step n={1} title="Información de contacto">
-          <Field label="Correo Electrónico" name="email" type="email" autoComplete="email" required />
+          {!session && (
+            <p className="-mt-2 rounded border border-rule bg-sheet px-4 py-3 text-[13.125px] text-panel">
+              <Link href="/cuenta/ingresar" className="font-bold underline underline-offset-2">
+                Inicia sesión
+              </Link>{" "}
+              o{" "}
+              <Link href="/cuenta/registro" className="font-bold underline underline-offset-2">
+                crea una cuenta
+              </Link>{" "}
+              para seguir el estado de tu pedido desde Mi cuenta.
+            </p>
+          )}
+          <Field label="Correo Electrónico" name="email" type="email" autoComplete="email" required defaultValue={session?.user.email ?? ""} key={session?.user.email ?? "anon"} />
           <label className="flex items-center gap-2 text-[13.125px] text-gray">
             <input type="checkbox" name="novedades" defaultChecked className="size-4 accent-[#0d6efd]" />
             Enviarme novedades y ofertas por correo electrónico
@@ -101,8 +177,8 @@ export function CheckoutView() {
 
         <Step n={2} title="Dirección de envío">
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Nombre" name="nombre" autoComplete="given-name" required />
-            <Field label="Apellido" name="apellido" autoComplete="family-name" required />
+            <Field label="Nombre" name="nombre" autoComplete="given-name" required defaultValue={firstName} key={`n-${firstName}`} />
+            <Field label="Apellido" name="apellido" autoComplete="family-name" required defaultValue={rest.join(" ")} key={`a-${rest.join(" ")}`} />
           </div>
           <Field label="Dirección completa" name="direccion" autoComplete="street-address" required />
           <Field label="Referencia, departamento, etc. (opcional)" name="referencia" />
@@ -178,6 +254,12 @@ export function CheckoutView() {
               <dt className="text-gray">Subtotal</dt>
               <dd className="font-bold">{soles(subtotal)}</dd>
             </div>
+            {discount > 0 && (
+              <div className="flex justify-between leading-[23px]">
+                <dt className="text-gray">Promo {promo.label}</dt>
+                <dd className="font-bold text-success">− {soles(discount)}</dd>
+              </div>
+            )}
             <div className="flex items-center justify-between gap-4 leading-[23px]">
               <dt className="text-gray">Envío</dt>
               <dd className={`text-right text-[13.125px] font-bold ${shipping ? "" : "text-success"}`}>{shipping ? `${soles(shipping.price)} · ${shipping.label}` : "Elige tu departamento"}</dd>
@@ -189,9 +271,10 @@ export function CheckoutView() {
           </div>
           <button
             type="submit"
-            className="condensed mt-4 flex h-[74px] w-full items-center justify-center gap-2 border border-panel bg-panel text-base font-bold text-white shadow-[0_2px_4px_rgba(0,0,0,0.075)] transition-colors hover:bg-black"
+            disabled={busy}
+            className="condensed mt-4 flex h-[74px] w-full items-center justify-center gap-2 border border-panel bg-panel text-base font-bold text-white shadow-[0_2px_4px_rgba(0,0,0,0.075)] transition-colors hover:bg-black disabled:cursor-wait disabled:opacity-70"
           >
-            Finalizar mi compra <span aria-hidden="true">→</span>
+            {busy ? "Registrando pedido…" : <>Finalizar mi compra <span aria-hidden="true">→</span></>}
           </button>
           <p className="mt-4 flex items-center justify-center gap-1.5 text-[13.125px] text-gray">
             <svg viewBox="0 0 24 24" fill="currentColor" className="size-3.5" aria-hidden="true">

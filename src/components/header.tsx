@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth";
 import { useCart } from "@/lib/cart";
 
 // Medidas de referencia (desktop): alto 61px (10px + 40px + 10px + borde 1px), padding lateral 24px,
@@ -48,6 +49,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { count } = useCart();
+  const { session } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -92,9 +94,14 @@ export function Header() {
           <button type="button" aria-label="Buscar" className="transition-opacity hover:opacity-60">
             <SearchIcon />
           </button>
-          <button type="button" aria-label="Mi cuenta" className="hidden transition-opacity hover:opacity-60 sm:block">
+          <Link
+            href={session ? "/cuenta" : "/cuenta/ingresar"}
+            aria-label={session ? "Mi cuenta" : "Iniciar sesión"}
+            className="relative hidden transition-opacity hover:opacity-60 sm:block"
+          >
             <UserIcon />
-          </button>
+            {session && <span className="absolute -top-1 -right-1.5 size-2 rounded-full bg-highlight" aria-hidden="true" />}
+          </Link>
           <button type="button" aria-label="Favoritos" className="relative hidden transition-opacity hover:opacity-60 sm:block">
             <HeartIcon />
             <Count n={0} className="-top-2 -right-2.5" />
@@ -116,6 +123,11 @@ export function Header() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link href={session ? "/cuenta" : "/cuenta/ingresar"} className="text-base font-bold tracking-[2px] uppercase" onClick={() => setOpen(false)}>
+                {session ? "Mi cuenta" : "Iniciar sesión"}
+              </Link>
+            </li>
           </ul>
         </nav>
       )}

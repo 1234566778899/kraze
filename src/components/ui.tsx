@@ -58,7 +58,7 @@ export function SectionHeading({
           <span>[ {label} ]</span>
           {index && <span>[ {index} ]</span>}
         </p>
-        <h2 className="display text-5xl md:text-7xl">
+        <h2 className="display text-[clamp(2.25rem,11vw,3rem)] md:text-7xl">
           <ScrambleText text={title} />
         </h2>
       </div>

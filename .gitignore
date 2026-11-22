@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# notas privadas con credenciales
+CLAUDE.md
+
+# fuentes de fotos (capturas de Instagram y originales de ChatGPT), pesan ~83 MB
+/assets-src/

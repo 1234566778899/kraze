@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { soles, useCart, type CartLine } from "@/lib/cart";
+import { promo } from "@/lib/products";
 
 const CartIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className="size-5" aria-hidden="true">
@@ -34,7 +35,7 @@ export function PageTitle({ title, subtitle }: { title: string; subtitle: string
 const cols = "md:grid-cols-[325fr_97fr_212fr_143fr_71fr]";
 
 export function CartView() {
-  const { ready, lines, subtotal } = useCart();
+  const { ready, lines, subtotal, discount, total, count } = useCart();
 
   if (!ready) return <div className="h-[430px]" aria-busy="true" />;
 
@@ -77,6 +78,12 @@ export function CartView() {
               <dt className="text-gray">Subtotal</dt>
               <dd className="font-bold">{soles(subtotal)}</dd>
             </div>
+            {discount > 0 && (
+              <div className="flex justify-between leading-[23px]">
+                <dt className="text-gray">Promo {promo.label}</dt>
+                <dd className="font-bold text-highlight">− {soles(discount)}</dd>
+              </div>
+            )}
             <div className="flex justify-between leading-[23px]">
               <dt className="text-gray">Envío</dt>
               <dd className="font-bold text-highlight">En el checkout</dd>
@@ -84,8 +91,13 @@ export function CartView() {
           </dl>
           <div className="mt-[14px] flex items-center justify-between">
             <span className="condensed text-[28px] leading-[42px] font-bold">Total</span>
-            <span className="condensed text-[28px] leading-[42px] font-bold text-highlight">{soles(subtotal)}</span>
+            <span className="condensed text-[28px] leading-[42px] font-bold text-highlight">{soles(total)}</span>
           </div>
+          {count % promo.qty === 1 && (
+            <p className="mt-3 text-[13px] text-white/70">
+              Añade 1 polo más y llévate {promo.qty} por {soles(promo.price)}.
+            </p>
+          )}
           <Link
             href="/carrito/checkout"
             className="condensed mt-12 flex h-16 items-center justify-center gap-3 border border-highlight bg-highlight text-xl font-bold tracking-[2px]! text-black transition-[filter] hover:brightness-105"

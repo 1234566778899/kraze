@@ -1,5 +1,6 @@
-// Catálogo de ejemplo basado en las prendas del Instagram de KRAZE.
-// Los precios, el stock y las medidas son de ejemplo: confirmar con la marca.
+// Catálogo armado a partir del Instagram de KRAZE (@kraze_peru): cada polo es un color con
+// un estampado al frente y otro en la espalda. Precio S/ 45 y promo 2 x S/ 80 según sus publicaciones.
+// El stock y las medidas siguen siendo de ejemplo: confirmar con la marca.
 
 export type Size = "S" | "M" | "L";
 
@@ -12,56 +13,44 @@ export type Product = {
   color: string;
   colorHex: string;
   price: number;
+  /** Orden: frente (fondo blanco), espalda (fondo blanco) y luego fotos con modelos. */
   images: string[];
   imageTone: "light" | "dark";
   stock: Record<Size, number>;
   badge?: Badge;
-  collection: string;
+  /** Estampado del frente y de la espalda, tal como aparecen en Instagram. */
+  front: string;
+  back: string;
   description: string;
 };
 
-const img = (name: string) => `/img/${name}`;
+// Fotos editadas a partir de las publicaciones de @kraze_peru (ver assets-src/instagram).
+const gallery = (folder: string, models: number) => [
+  `/img/productos/${folder}/frente.jpg`,
+  `/img/productos/${folder}/espalda.jpg`,
+  ...Array.from({ length: models }, (_, i) => `/img/productos/${folder}/modelo-${i + 1}.jpg`),
+];
+
+export const PRICE = 45;
+
+/** Promo de Instagram: 2 polos por S/ 80 (se aplica por cada par en el carrito). */
+export const promo = { qty: 2, price: 80, label: "2 polos x S/ 80" };
 
 export const products: Product[] = [
-  {
-    slug: "polo-boxy-kraze-gaming-negro",
-    name: 'Polo Boxy "kraze gaming"',
-    design: "kraze gaming",
-    color: "Negro",
-    colorHex: "#0d0d0d",
-    price: 45,
-    images: [
-      img("prod-negro-gaming.jpg"),
-      img("ig-duo-vino-negro-estudio.png"),
-      img("ig-reserve-seis-polos-flat.png"),
-      img("ig-pareja-adventures-verde.png"),
-    ],
-    imageTone: "light",
-    stock: { S: 2, M: 3, L: 2 },
-    badge: { label: "Últimas 3", tone: "fire" },
-    collection: "Drop 05",
-    description:
-      "Nuestro básico de todos los días. Bordado frontal minimalista, corte boxy con hombros caídos y algodón grueso que mantiene la forma.",
-  },
   {
     slug: "polo-boxy-adventures-navy",
     name: 'Polo Boxy "Adventures"',
     design: "Adventures",
-    color: "Navy",
+    color: "Azul oscuro",
     colorHex: "#1b2340",
-    price: 45,
-    images: [
-      img("prod-navy-adventures.jpg"),
-      img("ig-calle-navy-vino-espalda.png"),
-      img("prod-vino-sports-navy.jpg"),
-      img("ig-pareja-adventures-verde.png"),
-    ],
+    price: PRICE,
+    images: gallery("adventures-azul", 3),
     imageTone: "light",
     stock: { S: 6, M: 8, L: 5 },
-    badge: { label: "Nuevo", tone: "ink" },
-    collection: "Drop 05",
-    description:
-      'Estampado "kraze Adventures" en el pecho. Un azul marino profundo que combina con todo.',
+    badge: { label: "Más vendido", tone: "ink" },
+    front: "kraze Adventures",
+    back: "Estrella",
+    description: "Azul oscuro con “kraze Adventures” en el pecho y la estrella KRAZE en la espalda.",
   },
   {
     slug: "polo-boxy-kraze-originals-verde",
@@ -69,50 +58,85 @@ export const products: Product[] = [
     design: "Kraze Originals",
     color: "Verde",
     colorHex: "#1f3d2e",
-    price: 45,
-    images: [
-      img("prod-verde-originals.jpg"),
-      img("ig-verde-resort-collage.png"),
-      img("ig-pareja-adventures-verde.png"),
-    ],
-    imageTone: "dark",
-    stock: { S: 4, M: 5, L: 3 },
-    collection: "Drop 05",
-    description:
-      'Verde botella con el sello "KRAZE ORIGINALS" al centro. Discreto, limpio y con mucha presencia.',
-  },
-  {
-    slug: "polo-boxy-boundless-art-hueso",
-    name: 'Polo Boxy "Boundless Art"',
-    design: "Boundless Art",
-    color: "Hueso",
-    colorHex: "#ede6d8",
-    price: 45,
-    images: [
-      img("prod-hueso-boundless.jpg"),
-      img("ig-boundless-caminando.png"),
-      img("ig-vino-atardecer-pareja.png"),
-    ],
+    price: PRICE,
+    images: gallery("originals-verde", 3),
     imageTone: "light",
-    stock: { S: 3, M: 2, L: 0 },
-    badge: { label: "Últimas 5", tone: "fire" },
-    collection: "Nueva colección",
-    description:
-      "Flor ilustrada en la espalda y el lema “From Kraze to the world”. Nuestra pieza más artística.",
+    stock: { S: 4, M: 5, L: 3 },
+    front: "Prime Kraze Originals · American Culture",
+    back: "Kraze Resort · Amazonian Culture",
+    description: "Verde botella. “Kraze Originals” al frente y el escudo “Kraze Resort” con cinco estrellas en la espalda.",
   },
   {
     slug: "polo-boxy-sports-kraze-vino",
     name: 'Polo Boxy "Sports Kraze"',
     design: "Sports Kraze",
     color: "Vino",
-    colorHex: "#6b1e2a",
-    price: 45,
-    images: [img("prod-vino-sports-navy.jpg"), img("ig-vino-estrellas-pared.png")],
-    imageTone: "dark",
+    colorHex: "#5a1a26",
+    price: PRICE,
+    images: gallery("sports-vino", 3),
+    imageTone: "light",
     stock: { S: 5, M: 6, L: 4 },
-    collection: "Drop 05",
-    description:
-      "Gráfico de básquet en la espalda con tipografía script. Para los que viven en la cancha.",
+    front: "Kraze Perú · Proudly Peruvian",
+    back: "Sports Kraze",
+    description: "Vino con “Kraze Perú” en el pecho y el gráfico de básquet “Sports Kraze” en la espalda.",
+  },
+  {
+    slug: "polo-boxy-kraze-studios-rojo",
+    name: 'Polo Boxy "Kraze Studios"',
+    design: "Kraze Studios",
+    color: "Rojo",
+    colorHex: "#8e1b24",
+    price: PRICE,
+    images: gallery("studios-rojo", 3),
+    imageTone: "light",
+    stock: { S: 3, M: 3, L: 2 },
+    front: "Kraze Dreams · Kraze Elite",
+    back: "Kraze Studios · Loungewear Esthétique",
+    description: "Rojo intenso con “Kraze Dreams” y “Kraze Elite” al frente, y los laureles de “Kraze Studios” en la espalda.",
+  },
+  {
+    slug: "polo-boxy-boundless-art-hueso",
+    name: 'Polo Boxy "Boundless Art"',
+    design: "Boundless Art",
+    color: "Perla",
+    colorHex: "#ede6d8",
+    price: PRICE,
+    images: gallery("boundless-perla", 3),
+    imageTone: "light",
+    stock: { S: 3, M: 2, L: 0 },
+    badge: { label: "Últimas 5", tone: "fire" },
+    front: "John Kraze",
+    back: "Boundless Art · flor",
+    description: "Perla con la firma “John Kraze” al frente y la flor “Boundless Art” en la espalda.",
+  },
+  {
+    slug: "polo-boxy-kraze-gaming-negro",
+    name: 'Polo Boxy "Kraze Gaming"',
+    design: "Kraze Gaming",
+    color: "Negro",
+    colorHex: "#0d0d0d",
+    price: PRICE,
+    images: gallery("gaming-negro", 3),
+    imageTone: "light",
+    stock: { S: 2, M: 3, L: 2 },
+    badge: { label: "Últimas 7", tone: "fire" },
+    front: "kraze gaming",
+    back: "Spirits of Summer",
+    description: "Negro con “kraze gaming” en el pecho y el gráfico “Spirits of Summer” en la espalda.",
+  },
+  {
+    slug: "polo-boxy-no-dream-gris",
+    name: 'Polo Boxy "No Dream Is Impossible"',
+    design: "No Dream Is Impossible",
+    color: "Gris oscuro",
+    colorHex: "#3a3a3c",
+    price: PRICE,
+    images: gallery("nodream-gris", 3),
+    imageTone: "light",
+    stock: { S: 4, M: 4, L: 3 },
+    front: "KRAZE · No dream is impossible",
+    back: "kraze · The jungle remembers what the world forgets",
+    description: "Gris oscuro con “KRAZE — No dream is impossible” al frente y el logo ovalado “kraze” en la espalda.",
   },
   {
     slug: "polo-boxy-kraze-low-blanco",
@@ -120,40 +144,14 @@ export const products: Product[] = [
     design: "KRAZE LOW",
     color: "Blanco",
     colorHex: "#ffffff",
-    price: 45,
-    images: [img("ig-kraze-low-collage.png")],
-    imageTone: "dark",
+    price: PRICE,
+    images: gallery("low-blanco", 3),
+    imageTone: "light",
     stock: { S: 0, M: 0, L: 0 },
     badge: { label: "Agotado", tone: "muted" },
-    collection: "3ra colección",
-    description: "Dobermans y tipografía roja. Se agotó en días; atento al próximo drop.",
-  },
-  {
-    slug: "polo-boxy-kraze-resort-verde",
-    name: 'Polo Boxy "Kraze Resort"',
-    design: "Kraze Resort",
-    color: "Verde",
-    colorHex: "#1f3d2e",
-    price: 45,
-    images: [img("ig-verde-resort-collage.png")],
-    imageTone: "dark",
-    stock: { S: 2, M: 4, L: 3 },
-    collection: "4ta colección",
-    description: "Escudo “Kraze Resort” con cinco estrellas en la espalda. Vibra de club privado.",
-  },
-  {
-    slug: "polo-boxy-kraze-studios-vino",
-    name: 'Polo Boxy "Kraze Studios"',
-    design: "Kraze Studios",
-    color: "Vino",
-    colorHex: "#8e1b24",
-    price: 45,
-    images: [img("ig-vino-estrellas-pared.png")],
-    imageTone: "dark",
-    stock: { S: 3, M: 3, L: 2 },
-    badge: { label: "Nuevo", tone: "ink" },
-    collection: "4ta colección",
-    description: "Loungewear Esthétique: laureles y tipografía serif en la espalda, rojo intenso.",
+    front: "KRAZE LOW · dobermans",
+    back: "Firma Kraze",
+    description: "Blanco con tres dobermans y la tipografía roja “KRAZE LOW”. Se agotó en días; atento al próximo drop.",
   },
 ];
 
@@ -174,20 +172,12 @@ export const formatPrice = (n: number) => `S/ ${n.toFixed(0)}`;
 
 export const getProduct = (slug: string) => products.find((p) => p.slug === slug);
 
-export const filters = ["Todos", "Negro", "Navy", "Vino", "Verde", "Hueso"] as const;
-
-export const collections = [
-  { number: "01", title: "1ra colección", year: "2025", status: "Agotada", image: "/img/ig-reserve-seis-polos-flat.png" },
-  { number: "02", title: "2da colección", year: "2025", status: "Quedan 4 piezas", image: "/img/ig-verde-resort-collage.png" },
-  { number: "03", title: "3ra colección", year: "2026", status: "Quedan 9 piezas", image: "/img/ig-kraze-low-collage.png" },
-  { number: "04", title: "4ta colección", year: "2026", status: "Quedan 12 piezas", image: "/img/ig-calle-navy-vino-espalda.png" },
-];
 
 export const community = [
-  { image: "/img/ig-calle-navy-vino-espalda.png", caption: "Pucallpa" },
-  { image: "/img/ig-boundless-caminando.png", caption: "Pucallpa" },
-  { image: "/img/ig-pareja-adventures-verde.png", caption: "Huánuco" },
-  { image: "/img/ig-vino-estrellas-pared.png", caption: "Pucallpa" },
-  { image: "/img/ig-bmx-polo.png", caption: "Tingo María" },
-  { image: "/img/ig-vino-atardecer-pareja.png", caption: "Pucallpa" },
+  { image: "/img/productos/adventures-azul/modelo-2.jpg", caption: "Adventures · Azul oscuro" },
+  { image: "/img/productos/boundless-perla/modelo-2.jpg", caption: "Boundless Art · Perla" },
+  { image: "/img/productos/originals-verde/modelo-1.jpg", caption: "Kraze Originals · Verde" },
+  { image: "/img/productos/studios-rojo/modelo-3.jpg", caption: "Kraze Studios · Rojo" },
+  { image: "/img/productos/gaming-negro/modelo-1.jpg", caption: "Kraze Gaming · Negro" },
+  { image: "/img/productos/sports-vino/modelo-2.jpg", caption: "Sports Kraze · Vino" },
 ];

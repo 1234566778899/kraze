@@ -4,6 +4,7 @@ import { ComplaintForm } from "@/components/complaint-form";
 export const metadata: Metadata = {
   title: "Libro de Reclamaciones",
   description: "Hoja de reclamación virtual de KRAZE conforme al Código de Protección y Defensa del Consumidor.",
+  alternates: { canonical: "/reclamaciones" },
 };
 
 export default function ComplaintsPage() {

@@ -1,16 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { isSoldOut, products, type Product } from "@/lib/products";
-import { site } from "@/lib/site";
+import { isSoldOut, products, promo, type Product } from "@/lib/products";
 import { RelatedCard } from "./related-card";
 
 // Medidas de referencia (desktop): barra lateral 306px, grilla 966px (3 × 306 + 24px), barra de resultados 61px.
 
 const categories: { id: string; label: string; match: (p: Product) => boolean }[] = [
-  { id: "todas", label: "Todas", match: () => true },
-  { id: "drop", label: site.currentDrop.name, match: (p) => p.collection === site.currentDrop.name || p.collection === "Nueva colección" },
-  { id: "anteriores", label: "Colecciones anteriores", match: (p) => p.collection !== site.currentDrop.name && p.collection !== "Nueva colección" },
+  { id: "todas", label: "Todos los polos", match: () => true },
+  { id: "disponibles", label: "Disponibles", match: (p) => !isSoldOut(p) },
+  { id: "agotados", label: "Agotados", match: (p) => isSoldOut(p) },
 ];
 
 const sorts = [
@@ -90,6 +89,12 @@ export function ShopView() {
               );
             })}
           </ul>
+        </div>
+
+        <div className="rounded-lg border-2 border-black bg-highlight p-6 text-center">
+          <p className="font-[family-name:var(--font-condensed)] text-xl leading-6 font-bold tracking-[5px] text-black uppercase">Promo</p>
+          <p className="mt-2 font-[family-name:var(--font-condensed)] text-[40px] leading-none font-bold text-black">{promo.qty} x S/ {promo.price}</p>
+          <p className="mt-2 text-[12px] leading-4 text-black/70">Combina diseños y colores. El descuento se aplica solo en el carrito. Precio regular S/ 45 c/u.</p>
         </div>
 
         <div className="relative overflow-hidden rounded-lg bg-[#0a0a0a] p-6 text-center">

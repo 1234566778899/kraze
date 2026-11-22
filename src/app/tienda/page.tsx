@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { ShopView } from "@/components/shop-view";
 
-export const metadata: Metadata = { title: "Nuestra tienda" };
+export const metadata: Metadata = {
+  title: "Polos boxy fit — Tienda",
+  description:
+    "Compra polos boxy fit KRAZE: Adventures, Kraze Originals, Sports Kraze, Kraze Studios y más. S/ 45 c/u o 2 x S/ 80. Tallas S, M y L con envío a todo el Perú.",
+  alternates: { canonical: "/tienda" },
+  openGraph: { url: "/tienda" },
+};
 
 export default function ShopPage() {
   return (
@@ -20,7 +26,7 @@ export default function ShopPage() {
             Nuestra <span className="text-transparent [-webkit-text-stroke:1.5px_white]">Tienda</span>
           </h1>
           <p className="mt-2 max-w-[500px] text-[13.125px] leading-5 text-white/50">
-            Explora nuestra selección de polos boxy fit en ediciones limitadas. Algodón pesado, cortes que no se repiten.
+            Explora nuestros polos boxy fit en ediciones limitadas. Algodón jersey 20/1, S/ 45 c/u o 2 x S/ 80.
           </p>
         </div>
       </section>

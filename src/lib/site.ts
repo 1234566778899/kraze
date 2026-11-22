@@ -1,11 +1,16 @@
 // Datos generales de la marca. Reemplazar con la información real antes de publicar.
 export const site = {
   name: "KRAZE",
+  /** Dominio principal (kraze.ink redirige aquí). Se usa para URLs canónicas, sitemap y Open Graph. */
+  url: "https://www.kraze.ink",
+  description:
+    "Polos boxy fit de algodón jersey 20/1 en ediciones limitadas, hechos en Pucallpa. S/ 45 c/u o 2 x S/ 80. Envíos a todo el Perú y pago contra entrega en Pucallpa.",
   tagline: "Boxy fit · Ediciones limitadas",
   instagram: "https://www.instagram.com/kraze_peru/",
   instagramHandle: "@kraze_peru",
-  // Enlace de WhatsApp que aparece en el perfil de Instagram.
-  whatsapp: "https://wa.link/isvjj2",
+  // Número del WhatsApp de la marca (el enlace wa.link/isvjj2 del Instagram redirige a este número,
+  // pero ignora el texto del mensaje, por eso se usa wa.me directamente).
+  whatsapp: "https://wa.me/51978708662",
   currentDrop: {
     name: "Drop 05",
     totalUnits: 120,
@@ -17,7 +22,7 @@ export const site = {
     // Fecha de ejemplo para la cuenta regresiva.
     date: "2026-12-12T20:00:00-05:00",
   },
-  promo: "3 polos x S/ 120",
+  promo: "2 polos x S/ 80",
   // Datos del proveedor para el Libro de Reclamaciones. REEMPLAZAR con los datos reales de la empresa.
   legal: {
     razonSocial: "KRAZE (razón social por definir)",
@@ -57,3 +62,6 @@ export const shippingCities = [
   "Tingo María, Huánuco",
   "Otra ciudad",
 ];
+
+/** Enlace de WhatsApp con un mensaje ya escrito. */
+export const whatsappWith = (text: string) => `${site.whatsapp}?text=${encodeURIComponent(text)}`;

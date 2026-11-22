@@ -10,7 +10,7 @@ const Chevron = ({ dir }: { dir: "left" | "right" }) => (
   </svg>
 );
 
-/** Galería: foto principal 2:3 (736px de ancho en desktop) y miniaturas 137×206 debajo. */
+/** Galería: frente y espalda sobre fondo blanco y luego las fotos con modelos (4:5, 736px de ancho en desktop). */
 export function ProductGallery({ product }: { product: Product }) {
   const [active, setActive] = useState(0);
   const images = product.images;
@@ -19,11 +19,11 @@ export function ProductGallery({ product }: { product: Product }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative aspect-[2/3] overflow-hidden bg-studio">
+      <div className="relative aspect-[4/5] overflow-hidden bg-white">
         <Image
           key={images[active]}
           src={images[active]}
-          alt={`${product.name} — ${product.color}, foto ${active + 1}`}
+          alt={`${product.name} ${product.color}, ${active === 0 ? "frente" : active === 1 ? "espalda" : `foto con modelo ${active - 1}`}`}
           fill
           preload={active === 0}
           quality={85}
@@ -42,7 +42,7 @@ export function ProductGallery({ product }: { product: Product }) {
         )}
       </div>
       {many && (
-        <div className="flex gap-3" role="tablist" aria-label="Fotos del producto">
+        <div className="flex flex-wrap gap-3" role="tablist" aria-label="Fotos del producto">
           {images.map((src, i) => (
             <button
               key={src}
@@ -51,7 +51,7 @@ export function ProductGallery({ product }: { product: Product }) {
               aria-selected={active === i}
               aria-label={`Ver foto ${i + 1}`}
               onClick={() => setActive(i)}
-              className={`relative aspect-[2/3] w-[18.6%] max-w-[137px] overflow-hidden border-2 bg-studio ${active === i ? "border-highlight" : "border-transparent opacity-80 hover:opacity-100"}`}
+              className={`relative aspect-[4/5] w-[18.6%] max-w-[137px] overflow-hidden border-2 bg-white ${active === i ? "border-highlight" : "border-transparent opacity-80 hover:opacity-100"}`}
             >
               <Image src={src} alt="" fill sizes="137px" className="object-cover" />
             </button>

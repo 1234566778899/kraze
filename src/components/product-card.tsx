@@ -12,13 +12,13 @@ export function ProductCard({ product, sizesAttr = "(max-width: 768px) 50vw, 33v
 
   return (
     <article className="group flex flex-col items-center gap-4 text-center">
-      <Link href={href} className="relative block aspect-[4/5] w-full overflow-hidden rounded-xl bg-studio">
+      <Link href={href} className="relative block aspect-[4/5] w-full overflow-hidden rounded-xl bg-white">
         <Image
           src={first}
           alt={`${product.name} — ${product.color}`}
           fill
           sizes={sizesAttr}
-          className={`object-cover transition duration-700 group-hover:scale-[1.04] ${second ? "group-hover:opacity-0" : ""} ${soldOut ? "grayscale" : ""}`}
+          className={`object-cover transition duration-700 ${second ? "group-hover:opacity-0" : "group-hover:scale-[1.04]"} ${soldOut ? "grayscale" : ""}`}
         />
         {second && (
           <Image src={second} alt="" fill sizes={sizesAttr} className="object-cover opacity-0 transition duration-700 group-hover:opacity-100" />

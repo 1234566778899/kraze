@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { getProduct, type Product, type Size } from "./products";
+import { getProduct, promo, type Product, type Size } from "./products";
 
 // Carrito guardado en el navegador (localStorage). No hay backend ni pagos todavía.
 
@@ -13,6 +13,9 @@ type CartContextValue = {
   lines: CartLine[];
   count: number;
   subtotal: number;
+  /** Descuento de la promo 2 x S/ 80 (por cada par de polos). */
+  discount: number;
+  total: number;
   add: (slug: string, size: Size, qty?: number) => void;
   setQty: (slug: string, size: Size, qty: number) => void;
   remove: (slug: string, size: Size) => void;
@@ -80,11 +83,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const product = getProduct(i.slug);
       return product ? [{ ...i, product, subtotal: product.price * i.qty }] : [];
     });
+    const count = lines.reduce((a, l) => a + l.qty, 0);
+    const subtotal = lines.reduce((a, l) => a + l.subtotal, 0);
+    // Cada par de polos cuesta promo.price: se descuenta la diferencia con el precio de los dos más baratos.
+    const units = lines.flatMap((l) => Array.from({ length: l.qty }, () => l.product.price)).sort((a, b) => a - b);
+    let discount = 0;
+    for (let i = 0; i + promo.qty <= units.length; i += promo.qty) {
+      discount += Math.max(0, units.slice(i, i + promo.qty).reduce((a, b) => a + b, 0) - promo.price);
+    }
     return {
       ready,
       lines,
-      count: lines.reduce((a, l) => a + l.qty, 0),
-      subtotal: lines.reduce((a, l) => a + l.subtotal, 0),
+      count,
+      subtotal,
+      discount,
+      total: subtotal - discount,
       add,
       setQty,
       remove,
