@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { gaItem, track } from "@/lib/analytics";
 import { useCart } from "@/lib/cart";
 import { sizes, type Product, type Size } from "@/lib/products";
-import { HeartIcon } from "./icons";
+import { WishlistButton } from "./wishlist-button";
 
 const CartIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className="size-5" aria-hidden="true">
@@ -21,7 +21,6 @@ const RulerIcon = () => (
   </svg>
 );
 
-// "Lista de deseos" todavía es solo diseño.
 export function ProductBuyBox({ product }: { product: Product }) {
   const [size, setSize] = useState<Size | null>(null);
   const [added, setAdded] = useState(false);
@@ -87,9 +86,7 @@ export function ProductBuyBox({ product }: { product: Product }) {
       >
         Añadir al carrito <CartIcon />
       </button>
-      <button type="button" className="condensed mt-4 flex h-16 items-center justify-center gap-2.5 border border-panel text-xl font-bold text-panel transition-colors hover:bg-panel hover:text-white">
-        Lista de deseos <HeartIcon className="size-5" />
-      </button>
+      <WishlistButton product={product} />
       {added && <AddedDialog onClose={() => setAdded(false)} />}
     </div>
   );

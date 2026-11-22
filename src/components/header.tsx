@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useCart } from "@/lib/cart";
+import { useFavorites } from "@/lib/favorites";
 
 // Medidas de referencia (desktop): alto 61px (10px + 40px + 10px + borde 1px), padding lateral 24px,
 // menú Inter 12.8px/700 con 2px de espaciado y 30px entre enlaces, íconos de 19px con 20px entre sí,
@@ -50,6 +51,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const { count } = useCart();
   const { session } = useAuth();
+  const { favorites } = useFavorites();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -102,10 +104,10 @@ export function Header() {
             <UserIcon />
             {session && <span className="absolute -top-1 -right-1.5 size-2 rounded-full bg-highlight" aria-hidden="true" />}
           </Link>
-          <button type="button" aria-label="Favoritos" className="relative hidden transition-opacity hover:opacity-60 sm:block">
+          <Link href="/favoritos" aria-label={`Favoritos, ${favorites.length} productos`} className="relative hidden transition-opacity hover:opacity-60 sm:block">
             <HeartIcon />
-            <Count n={0} className="-top-2 -right-2.5" />
-          </button>
+            <Count n={favorites.length} className="-top-2 -right-2.5" />
+          </Link>
           <Link href="/carrito" aria-label={`Carrito, ${count} productos`} className="relative transition-opacity hover:opacity-60">
             <BagIcon />
             <Count n={count} className="-top-3 -right-2.5" />
@@ -123,6 +125,11 @@ export function Header() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link href="/favoritos" className="text-base font-bold tracking-[2px] uppercase" onClick={() => setOpen(false)}>
+                Favoritos
+              </Link>
+            </li>
             <li>
               <Link href={session ? "/cuenta" : "/cuenta/ingresar"} className="text-base font-bold tracking-[2px] uppercase" onClick={() => setOpen(false)}>
                 {session ? "Mi cuenta" : "Iniciar sesión"}
