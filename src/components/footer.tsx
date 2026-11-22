@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
+import { NewsletterForm } from "./newsletter-form";
 import { WhatsAppIcon } from "./whatsapp-button";
 
 const InstagramIcon = () => (
@@ -80,22 +81,7 @@ export function Footer() {
           </Link>
         </div>
 
-        <form className="flex flex-col gap-4" action="#">
-          <p className={head}>Boletín</p>
-          <p className="text-[13.125px] text-white/50 uppercase">Únete al círculo para drops exclusivos.</p>
-          <label htmlFor="newsletter" className="sr-only">
-            Correo electrónico
-          </label>
-          <input
-            id="newsletter"
-            type="email"
-            placeholder="CORREO ELECTRÓNICO"
-            className="h-[43px] border-b border-white/50 bg-transparent text-[15px] placeholder:text-white/50 focus:border-white focus:outline-none"
-          />
-          <button type="button" className="self-start text-base font-black tracking-[5px] uppercase">
-            Unirse →
-          </button>
-        </form>
+        <NewsletterForm heading={<p className={head}>Boletín</p>} />
       </div>
 
       <div className="mx-auto flex max-w-[1320px] flex-col gap-3 px-3 pb-12 md:flex-row md:items-center md:justify-between">

@@ -88,3 +88,30 @@ end $$;
 
 revoke all on function public.create_order from public;
 grant execute on function public.create_order to anon, authenticated;
+
+-- Boletín del footer: correos suscritos. Solo se escribe mediante subscribe_newsletter().
+create table if not exists public.newsletter_subscribers (
+  email text primary key,
+  source text not null default 'footer',
+  created_at timestamptz not null default now()
+);
+alter table public.newsletter_subscribers enable row level security;
+revoke all on public.newsletter_subscribers from anon, authenticated;
+grant all on public.newsletter_subscribers to service_role;
+
+-- Suscribe un correo (si ya existe no hace nada, sin revelar si estaba registrado).
+create or replace function public.subscribe_newsletter(p_email text, p_source text default 'footer') returns void
+language plpgsql security definer set search_path = '' as $$
+declare
+  e text := lower(trim(coalesce(p_email, '')));
+begin
+  if length(e) > 200 or e !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then
+    raise exception 'Correo inválido';
+  end if;
+  insert into public.newsletter_subscribers (email, source)
+  values (e, left(coalesce(nullif(trim(p_source), ''), 'footer'), 40))
+  on conflict (email) do nothing;
+end $$;
+
+revoke all on function public.subscribe_newsletter from public;
+grant execute on function public.subscribe_newsletter to anon, authenticated;
