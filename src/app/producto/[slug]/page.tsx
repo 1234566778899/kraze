@@ -5,6 +5,7 @@ import { Suspense, type ReactNode } from "react";
 import { ProductBuyBox } from "@/components/product-buy-box";
 import { ProductGallery } from "@/components/product-gallery";
 import { RelatedCard } from "@/components/related-card";
+import { TrackViewItem } from "@/components/track-view-item";
 import { getProduct, isSoldOut, measurements, products, promo, sizes } from "@/lib/products";
 import { shippingRates, site, whatsappWith } from "@/lib/site";
 
@@ -132,6 +133,7 @@ async function ProductContent({ params }: { params: PageProps<"/producto/[slug]"
 
   return (
     <main>
+      <TrackViewItem slug={product.slug} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className={`${grid} pt-5 pb-12`}>
         <div className="lg:sticky lg:top-20 lg:self-start">

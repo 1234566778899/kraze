@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
+import { track } from "@/lib/analytics";
 import { useAuth } from "@/lib/auth";
 import { authErrorMessage, supabase } from "@/lib/supabase";
 
@@ -98,6 +99,7 @@ export function LoginForm() {
     });
     setBusy(false);
     if (error) return setError(authErrorMessage(error.message));
+    track("login", { method: "email" });
     router.replace("/cuenta");
   };
 
@@ -151,6 +153,7 @@ export function RegisterForm() {
     if (error) return setError(authErrorMessage(error.message));
     // Supabase devuelve un usuario sin identidades cuando el correo ya está registrado.
     if (data.user && data.user.identities?.length === 0) return setError(authErrorMessage("already registered"));
+    track("sign_up", { method: "email" });
     if (data.session) return router.replace("/cuenta");
     setSentTo(email);
   };

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { gaItem, track } from "@/lib/analytics";
 import { useCart } from "@/lib/cart";
 import { sizes, type Product, type Size } from "@/lib/products";
 import { HeartIcon } from "./icons";
@@ -33,6 +34,7 @@ export function ProductBuyBox({ product }: { product: Product }) {
       return;
     }
     add(product.slug, size);
+    track("add_to_cart", { currency: "PEN", value: product.price, items: [gaItem(product, size)] });
     setAdded(true);
   };
 

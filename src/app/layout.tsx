@@ -6,6 +6,8 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { ShippingToast } from "@/components/shipping-toast";
 import { WhatsAppButton } from "@/components/whatsapp-button";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { GA_ID } from "@/lib/analytics";
 import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
 import { site } from "@/lib/site";
@@ -79,6 +81,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </CartProvider>
         </AuthProvider>
       </body>
+      {/* Google Analytics 4 solo en producción, para no mezclar visitas de desarrollo. */}
+      {process.env.NODE_ENV === "production" && <GoogleAnalytics gaId={GA_ID} />}
     </html>
   );
 }

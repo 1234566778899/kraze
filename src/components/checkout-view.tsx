@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
+import { gaItem, track } from "@/lib/analytics";
 import { useAuth } from "@/lib/auth";
 import { soles, useCart } from "@/lib/cart";
 import { promo } from "@/lib/products";
@@ -61,6 +62,19 @@ export function CheckoutView() {
 
   const shipping = shippingFor(department);
   const total = subtotal - discount + (shipping?.price ?? 0);
+
+  // begin_checkout una sola vez, cuando el carrito ya cargó y tiene productos.
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (!ready || lines.length === 0 || checkoutTracked.current) return;
+    checkoutTracked.current = true;
+    track("begin_checkout", {
+      currency: "PEN",
+      value: subtotal - discount,
+      coupon: discount > 0 ? promo.label : undefined,
+      items: lines.map((l) => gaItem(l.product, l.size, l.qty)),
+    });
+  }, [ready, lines, subtotal, discount]);
 
   if (!ready) return <div className="h-[900px]" aria-busy="true" />;
 
@@ -146,6 +160,15 @@ export function CheckoutView() {
     ].join("\n");
     if (tab) tab.location.href = whatsappWith(message);
     else window.location.assign(whatsappWith(message));
+    track("purchase", {
+      transaction_id: order,
+      currency: "PEN",
+      value: total,
+      shipping: shipping?.price ?? 0,
+      coupon: discount > 0 ? promo.label : undefined,
+      payment_type: method,
+      items: lines.map((l) => gaItem(l.product, l.size, l.qty)),
+    });
     setBusy(false);
     clear();
     setSent(order);
