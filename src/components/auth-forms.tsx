@@ -119,6 +119,9 @@ export function LoginForm() {
       <form onSubmit={onSubmit} className="flex flex-col gap-5">
         <Field label="Correo electrónico" name="email" type="email" autoComplete="email" required />
         <PasswordField label="Contraseña" name="password" autoComplete="current-password" required />
+        <Link href="/cuenta/recuperar" className="-mt-2 self-end text-[13px] font-bold text-panel underline underline-offset-2">
+          ¿Olvidaste tu contraseña?
+        </Link>
         {error && <ErrorText>{error}</ErrorText>}
         <SubmitButton busy={busy}>Ingresar</SubmitButton>
       </form>
@@ -197,6 +200,95 @@ export function RegisterForm() {
         {error && <ErrorText>{error}</ErrorText>}
         <SubmitButton busy={busy}>Crear cuenta</SubmitButton>
       </form>
+    </Card>
+  );
+}
+
+export function ForgotPasswordForm() {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [sentTo, setSentTo] = useState("");
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const email = String(new FormData(e.currentTarget).get("email")).trim();
+    setBusy(true);
+    setError("");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/cuenta/nueva-clave` });
+    setBusy(false);
+    if (error) return setError(authErrorMessage(error.message));
+    setSentTo(email);
+  };
+
+  return (
+    <Card
+      title="Recuperar contraseña"
+      subtitle="Te enviaremos un enlace para crear una nueva."
+      footer={
+        <Link href="/cuenta/ingresar" className="font-bold text-panel underline underline-offset-2">
+          Volver a iniciar sesión
+        </Link>
+      }
+    >
+      {sentTo ? (
+        <p className="leading-relaxed text-panel">
+          Si existe una cuenta con <strong>{sentTo}</strong>, te llegará un correo de KRAZE con el enlace para cambiar tu contraseña. Revisa también
+          la carpeta de spam.
+        </p>
+      ) : (
+        <form onSubmit={onSubmit} className="flex flex-col gap-5">
+          <Field label="Correo electrónico" name="email" type="email" autoComplete="email" required />
+          {error && <ErrorText>{error}</ErrorText>}
+          <SubmitButton busy={busy}>Enviar enlace</SubmitButton>
+        </form>
+      )}
+    </Card>
+  );
+}
+
+/** Se abre desde el enlace del correo: Supabase crea una sesión temporal y aquí se define la nueva contraseña. */
+export function NewPasswordForm() {
+  const { ready, session } = useAuth();
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget);
+    const password = String(f.get("password"));
+    if (password.length < 6) return setError("La contraseña debe tener al menos 6 caracteres.");
+    if (password !== String(f.get("confirm"))) return setError("Las contraseñas no coinciden.");
+    setBusy(true);
+    setError("");
+    const { error } = await supabase.auth.updateUser({ password });
+    setBusy(false);
+    if (error) return setError(authErrorMessage(error.message));
+    router.replace("/cuenta");
+  };
+
+  return (
+    <Card
+      title="Nueva contraseña"
+      subtitle="Elige una contraseña nueva para tu cuenta."
+      footer={
+        <Link href="/cuenta/recuperar" className="font-bold text-panel underline underline-offset-2">
+          Pedir otro enlace
+        </Link>
+      }
+    >
+      {!ready ? (
+        <div className="h-40" aria-busy="true" />
+      ) : !session ? (
+        <p className="leading-relaxed text-panel">El enlace venció o ya fue usado. Pide uno nuevo para cambiar tu contraseña.</p>
+      ) : (
+        <form onSubmit={onSubmit} className="flex flex-col gap-5">
+          <PasswordField label="Nueva contraseña" name="password" autoComplete="new-password" required minLength={6} />
+          <PasswordField label="Confirmar contraseña" name="confirm" autoComplete="new-password" required minLength={6} />
+          {error && <ErrorText>{error}</ErrorText>}
+          <SubmitButton busy={busy}>Guardar contraseña</SubmitButton>
+        </form>
+      )}
     </Card>
   );
 }

@@ -17,6 +17,7 @@ import { departments, shippingFor, whatsappWith } from "@/lib/site";
 const payments = [
   { id: "yape", title: "Yape / Plin", body: "Te enviaremos el número y el código QR por WhatsApp para que realices el pago." },
   { id: "transfer", title: "Transferencia bancaria", body: "Te compartiremos los números de cuenta por WhatsApp. Envíanos la constancia para despachar tu pedido." },
+  { id: "cod", title: "Pago contra entrega", body: "Solo en Pucallpa: pagas en efectivo, Yape o Plin cuando recibes tu pedido.", onlyUcayali: true },
 ];
 
 /** Número de respaldo si Supabase no responde: fecha (AAMMDD) + 4 cifras al azar, ej. 251122-4831. */
@@ -61,6 +62,8 @@ export function CheckoutView() {
   const [firstName, ...rest] = name.split(" ");
 
   const shipping = shippingFor(department);
+  // El pago contra entrega solo aplica en Pucallpa: si cambia el departamento, vuelve a Yape / Plin.
+  const activePayment = payment === "cod" && department !== "Ucayali" ? payments[0].id : payment;
   const total = subtotal - discount + (shipping?.price ?? 0);
 
   // begin_checkout una sola vez, cuando el carrito ya cargó y tiene productos.
@@ -105,7 +108,7 @@ export function CheckoutView() {
     if (busy) return;
     const f = new FormData(e.currentTarget);
     const get = (k: string) => String(f.get(k) ?? "").trim();
-    const method = payments.find((p) => p.id === payment)?.title ?? "";
+    const method = payments.find((p) => p.id === activePayment)?.title ?? "";
 
     // La pestaña se abre ya (dentro del clic) para que el navegador no la bloquee;
     // se le asigna el enlace de WhatsApp cuando Supabase devuelve el número de pedido.
@@ -153,7 +156,7 @@ export function CheckoutView() {
       ...lines.map((l) => `• ${l.product.design} ${l.product.color} (Talla: ${l.size}) x ${l.qty}`),
       rule,
       ...(discount > 0 ? [`Promo ${promo.label}: -${soles(discount)}`] : []),
-      `Envío: ${shipping ? soles(shipping.price) : "-"}`,
+      `Envío: ${shipping ? (shipping.price === 0 ? "Gratis" : soles(shipping.price)) : "-"}`,
       `*TOTAL: ${soles(total)}*`,
       "",
       "Por favor, confírmeme mi pedido.",
@@ -233,15 +236,15 @@ export function CheckoutView() {
         <Step n={3} title="Método de pago">
           <p className="-mt-2 text-[13.125px] text-gray">Coordinamos el pago por WhatsApp. No guardamos datos de tarjetas.</p>
           <div className="flex flex-col gap-3" role="radiogroup" aria-label="Método de pago">
-            {payments.map((p) => (
+            {payments.filter((p) => !("onlyUcayali" in p) || department === "Ucayali").map((p) => (
               <label
                 key={p.id}
                 className={`flex cursor-pointer flex-col gap-2 border-l-[3px] p-6 transition-colors ${
-                  payment === p.id ? "border-black bg-sheet" : "border-transparent bg-white outline outline-1 outline-rule"
+                  activePayment === p.id ? "border-black bg-sheet" : "border-transparent bg-white outline outline-1 outline-rule"
                 }`}
               >
                 <span className="flex items-center gap-2 font-bold">
-                  <input type="radio" name="pago" value={p.id} checked={payment === p.id} onChange={() => setPayment(p.id)} className="size-4 accent-[#0d6efd]" />
+                  <input type="radio" name="pago" value={p.id} checked={activePayment === p.id} onChange={() => setPayment(p.id)} className="size-4 accent-[#0d6efd]" />
                   {p.title}
                 </span>
                 <span className="text-[13.125px] leading-5 text-gray">{p.body}</span>
@@ -285,7 +288,7 @@ export function CheckoutView() {
             )}
             <div className="flex items-center justify-between gap-4 leading-[23px]">
               <dt className="text-gray">Envío</dt>
-              <dd className={`text-right text-[13.125px] font-bold ${shipping ? "" : "text-success"}`}>{shipping ? `${soles(shipping.price)} · ${shipping.label}` : "Elige tu departamento"}</dd>
+              <dd className={`text-right text-[13.125px] font-bold ${shipping ? "" : "text-success"}`}>{shipping ? (shipping.price === 0 ? shipping.label : `${soles(shipping.price)} · ${shipping.label}`) : "Elige tu departamento"}</dd>
             </div>
           </dl>
           <div className="flex items-center justify-between py-5">

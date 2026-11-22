@@ -14,6 +14,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
       images: p.images.map((src) => `${site.url}${src}`),
     })),
-    { url: `${site.url}/reclamaciones`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${site.url}/polos-pucallpa`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    ...["preguntas-frecuentes", "envios", "guia-de-tallas", "cambios-y-devoluciones", "contacto"].map((path) => ({
+      url: `${site.url}/${path}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    })),
+    ...["terminos-y-condiciones", "politica-de-privacidad", "reclamaciones"].map((path) => ({
+      url: `${site.url}/${path}`,
+      lastModified: now,
+      changeFrequency: "yearly" as const,
+      priority: 0.2,
+    })),
   ];
 }

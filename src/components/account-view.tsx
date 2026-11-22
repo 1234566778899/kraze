@@ -82,7 +82,7 @@ function OrderCard({ order }: { order: Order }) {
         )}
         <div className="flex justify-between">
           <dt className="text-gray">Envío</dt>
-          <dd className="font-bold">{soles(Number(order.shipping))}</dd>
+          <dd className="font-bold">{Number(order.shipping) === 0 ? "Gratis" : soles(Number(order.shipping))}</dd>
         </div>
         <div className="flex justify-between gap-6">
           <dt className="text-gray">Entrega</dt>

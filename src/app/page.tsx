@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { Countdown } from "@/components/countdown";
 import { FeaturedSlider } from "@/components/featured-slider";
 import { HeroCarousel, type HeroSlide } from "@/components/hero-carousel";
@@ -54,7 +55,7 @@ const jsonLd = [
     paymentAccepted: "Yape, Plin, transferencia bancaria, efectivo contra entrega",
     address: { "@type": "PostalAddress", addressLocality: "Pucallpa", addressRegion: "Ucayali", addressCountry: "PE" },
     areaServed: { "@type": "Country", name: "Perú" },
-    sameAs: [site.instagram],
+    sameAs: [site.instagram, site.tiktok],
     contactPoint: { "@type": "ContactPoint", contactType: "ventas", url: whatsappWith("Hola KRAZE"), availableLanguage: "es" },
   },
   {
@@ -148,6 +149,40 @@ export default function Home() {
                 <figcaption className="tech absolute bottom-3 left-3 text-[10px] text-snow drop-shadow">{c.caption}</figcaption>
               </figure>
             ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* TEXTO SEO: marca local de Pucallpa */}
+      <section className="border-t border-line py-20 md:py-24">
+        <Container className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:items-start">
+          <div className="flex flex-col gap-5">
+            <p className="tech text-mute">{"// Hecho en Pucallpa"}</p>
+            <h2 className="display text-[clamp(2rem,6vw,3.5rem)]">Polos boxy fit de Pucallpa para todo el Perú</h2>
+          </div>
+          <div className="flex flex-col gap-4 leading-relaxed text-snow/75">
+            <p>
+              KRAZE es una marca de streetwear nacida en Pucallpa. Hacemos polos boxy fit de algodón jersey 20/1 en ediciones limitadas: cada
+              drop trae pocos diseños y pocas piezas.
+            </p>
+            <p>
+              En Pucallpa el delivery es gratis y pagas contra entrega. También enviamos a Huánuco, Lima y todo el Perú. Cada polo cuesta S/ 45 o
+              llévate 2 por S/ 80.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-x-6 gap-y-3">
+              <Link href="/polos-pucallpa" className="caps text-[11px] text-snow underline underline-offset-4">
+                Polos en Pucallpa
+              </Link>
+              <Link href="/guia-de-tallas" className="caps text-[11px] text-snow underline underline-offset-4">
+                Guía de tallas
+              </Link>
+              <Link href="/envios" className="caps text-[11px] text-snow underline underline-offset-4">
+                Envíos
+              </Link>
+              <Link href="/preguntas-frecuentes" className="caps text-[11px] text-snow underline underline-offset-4">
+                Preguntas frecuentes
+              </Link>
+            </div>
           </div>
         </Container>
       </section>

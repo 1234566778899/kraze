@@ -20,7 +20,7 @@ const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "KRAZE® — Polos boxy fit en Perú | Streetwear de Pucallpa",
+    default: "KRAZE® — Polos boxy fit en Pucallpa y todo el Perú",
     template: "%s · KRAZE®",
   },
   description: site.description,

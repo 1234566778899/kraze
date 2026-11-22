@@ -202,7 +202,12 @@ async function ProductContent({ params }: { params: PageProps<"/producto/[slug]"
                   ))}
                 </tbody>
               </table>
-              <p className="mt-2">Medidas de la prenda en plano. Pecho = de axila a axila.</p>
+              <p className="mt-2">
+                Medidas de la prenda en plano. Pecho = de axila a axila.{" "}
+                <Link href="/guia-de-tallas" className="font-bold underline underline-offset-2">
+                  Ver guía de tallas
+                </Link>
+              </p>
             </Accordion>
             <Accordion title="Envío">
               <ul>
@@ -215,8 +220,16 @@ async function ProductContent({ params }: { params: PageProps<"/producto/[slug]"
                   </li>
                 ))}
               </ul>
+              <Link href="/envios" className="mt-2 inline-block font-bold underline underline-offset-2">
+                Ver todos los detalles de envío
+              </Link>
             </Accordion>
-            <Accordion title="Devoluciones">Tienes 7 días para cambiar tu talla. La prenda debe estar sin uso y con etiqueta. Coordina el cambio por WhatsApp.</Accordion>
+            <Accordion title="Devoluciones">
+              Tienes 7 días para cambiar tu talla. La prenda debe estar sin uso y con etiqueta. Coordina el cambio por WhatsApp.{" "}
+              <Link href="/cambios-y-devoluciones" className="font-bold underline underline-offset-2">
+                Ver condiciones
+              </Link>
+            </Accordion>
           </div>
           <a
             href={whatsappWith(`Hola KRAZE, tengo una consulta sobre el ${product.name} (${product.color}).`)}

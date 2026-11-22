@@ -18,15 +18,28 @@ const BookIcon = () => (
 );
 
 const shop = [
-  ["Novedades", "/#drop"],
-  ["Colecciones", "/#lookbook"],
   ["Ver todo", "/tienda"],
+  ["Novedades", "/#drop"],
+  ["Polos en Pucallpa", "/polos-pucallpa"],
+  ["Guía de tallas", "/guia-de-tallas"],
 ];
 const support = [
-  ["Envíos", "#"],
-  ["Devoluciones", "#"],
-  ["Contáctanos", site.whatsapp],
+  ["Envíos", "/envios"],
+  ["Cambios y devoluciones", "/cambios-y-devoluciones"],
+  ["Preguntas frecuentes", "/preguntas-frecuentes"],
+  ["Contacto", "/contacto"],
+  ["Mi cuenta", "/cuenta"],
 ];
+const legal = [
+  ["Términos y condiciones", "/terminos-y-condiciones"],
+  ["Política de privacidad", "/politica-de-privacidad"],
+];
+
+const TikTokIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="size-4.5" aria-hidden="true">
+    <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.6 2.6 0 0 1-2.6-2.6 2.6 2.6 0 0 1 3.37-2.48V9.66a5.73 5.73 0 0 0-.77-.05 5.69 5.69 0 0 0-5.69 5.69A5.69 5.69 0 0 0 9.86 21a5.69 5.69 0 0 0 5.69-5.69V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3a4.3 4.3 0 0 1-3.25-1.48Z" />
+  </svg>
+);
 
 // Medidas de referencia: padding 48px, título 32px, encabezados 13.125px con espaciado 5px, enlaces 13.125px.
 const head = "font-[family-name:var(--font-condensed)] text-[13.125px] font-extrabold tracking-[5px] uppercase";
@@ -42,6 +55,9 @@ export function Footer() {
           <div className="flex gap-3 text-white/60">
             <a href={site.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-white">
               <InstagramIcon />
+            </a>
+            <a href={site.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="hover:text-white">
+              <TikTokIcon />
             </a>
             <a href={site.whatsapp} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-white">
               <WhatsAppIcon className="size-4.5" />
@@ -85,7 +101,14 @@ export function Footer() {
       <div className="mx-auto flex max-w-[1320px] flex-col gap-3 px-3 pb-12 md:flex-row md:items-center md:justify-between">
         <div className="w-full border-t border-white/10 pt-8 md:flex md:items-center md:justify-between">
           <p className="text-[10.4px] tracking-[5px] text-white/50 uppercase">© 2026 KRAZE Studios — Pucallpa, Perú. Todos los derechos reservados.</p>
-          <p className="mt-3 text-[10.4px] tracking-[2px] text-white/50 uppercase md:mt-0">Yape · Plin · Visa · Mastercard</p>
+          <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 md:mt-0">
+            {legal.map(([label, href]) => (
+              <Link key={href} href={href} className="text-[10.4px] tracking-[2px] text-white/50 uppercase hover:text-white">
+                {label}
+              </Link>
+            ))}
+            <span className="text-[10.4px] tracking-[2px] text-white/50 uppercase">Yape · Plin · Contra entrega</span>
+          </div>
         </div>
       </div>
     </footer>

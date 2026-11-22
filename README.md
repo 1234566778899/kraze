@@ -24,6 +24,10 @@ Abre http://localhost:3000
 - `/carrito/checkout` — Datos de contacto, envío por departamento y método de pago; finaliza por WhatsApp.
 - `/cuenta/ingresar` y `/cuenta/registro` — inicio de sesión y registro (nombre, correo, contraseña) con Supabase Auth.
 - `/cuenta` — Mi cuenta: pedidos del cliente con su estado (recibido → confirmado → enviado → entregado).
+- `/cuenta/recuperar` y `/cuenta/nueva-clave` — recuperar contraseña por correo (Resend).
+- `/polos-pucallpa` — página para la búsqueda "polos en Pucallpa" (ver `docs/seo.md`).
+- `/envios`, `/cambios-y-devoluciones`, `/preguntas-frecuentes`, `/guia-de-tallas`, `/contacto` — soporte.
+- `/terminos-y-condiciones`, `/politica-de-privacidad` — legales (completar razón social y RUC en `src/lib/site.ts`).
 - `/reclamaciones` — Libro de Reclamaciones (hoja virtual). **Falta conectar el envío y la copia por correo.**
 
 ## Supabase (cuentas y pedidos)
@@ -34,6 +38,12 @@ Abre http://localhost:3000
   Los pedidos de invitados se guardan sin usuario; los de clientes con sesión aparecen en Mi cuenta.
 - **Para actualizar el estado de un pedido:** panel de Supabase → Table editor → `orders` → columna `status`
   (`pendiente`, `confirmado`, `enviado`, `entregado` o `cancelado`).
+
+## Correos (Resend)
+
+Los correos de cuenta (confirmar registro, recuperar contraseña) los envía Supabase por SMTP de Resend desde
+`no-reply@kraze.ink`. Las plantillas en español están en `supabase/email-templates/` y se pegan en
+Supabase → Authentication → Emails.
 
 ## Dónde editar el contenido
 
