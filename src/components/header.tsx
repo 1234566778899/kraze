@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
+import { SearchDialog } from "./search-dialog";
 
 // Medidas de referencia (desktop): alto 61px (10px + 40px + 10px + borde 1px), padding lateral 24px,
 // menú Inter 12.8px/700 con 2px de espaciado y 30px entre enlaces, íconos de 19px con 20px entre sí,
@@ -49,6 +50,8 @@ export function Header() {
   const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
   const { count } = useCart();
   const { session } = useAuth();
   const { favorites } = useFavorites();
@@ -60,8 +63,23 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Atajos: "/" o Ctrl/⌘+K abren el buscador (salvo que se esté escribiendo en un campo).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      const typing = el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName);
+      if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || (e.key === "/" && !typing)) {
+        e.preventDefault();
+        setOpen(false);
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   // En el home el header flota transparente sobre el hero; en el resto es negro.
-  const solid = !isHome || scrolled || open;
+  const solid = !isHome || scrolled || open || searchOpen;
 
   return (
     <header
@@ -93,7 +111,16 @@ export function Header() {
         <Logo className="md:hidden" />
 
         <div className="flex items-center justify-end gap-5">
-          <button type="button" aria-label="Buscar" className="transition-opacity hover:opacity-60">
+          <button
+            type="button"
+            aria-label="Buscar"
+            aria-expanded={searchOpen}
+            className="transition-opacity hover:opacity-60"
+            onClick={() => {
+              setOpen(false);
+              setSearchOpen((v) => !v);
+            }}
+          >
             <SearchIcon />
           </button>
           <Link
@@ -138,6 +165,8 @@ export function Header() {
           </ul>
         </nav>
       )}
+
+      {searchOpen && <SearchDialog onClose={closeSearch} />}
     </header>
   );
 }
